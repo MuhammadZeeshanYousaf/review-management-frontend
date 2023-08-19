@@ -1,24 +1,49 @@
-// import React from "react";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
+  const auth = useAuth();
+  const [formData, setFormData] = useState({
+    user: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      user: {
+        ...prevData.user,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    auth.login(formData);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen">
       <div className="m-auto p-6 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-semibold mb-4 text-gray-800">Login</h1>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              htmlFor="username"
+              htmlFor="email"
               className="block font-medium text-gray-800 mb-1"
             >
-              Username
+              Email
             </label>
             <input
               type="text"
-              id="username"
-              name="username"
-              className="w-full p-2 border rounded-md placeholder-gray-400"
-              placeholder="Enter your username"
+              id="email"
+              name="email"
+              className="w-full p-2 border rounded-md placeholder-gray-400 text-black"
+              placeholder="Enter your email"
+              onChange={handleChange}
             />
           </div>
           <div className="mb-4">
@@ -32,8 +57,9 @@ const LoginPage = () => {
               type="password"
               id="password"
               name="password"
-              className="w-full p-2 border rounded-md placeholder-gray-400"
+              className="w-full p-2 border rounded-md placeholder-gray-400 text-black"
               placeholder="Enter your password"
+              onChange={handleChange}
             />
           </div>
           <button
