@@ -45,29 +45,30 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  const authorizeUser = (response) => {
+    const accessToken = response.headers["authorization"].split(" ")[1]; // Extract JWT token from response headers
+    setToken(accessToken);
+    setUser({ ...response.data.data });
+
+    window.localStorage.setItem(authConfig.storageTokenKeyName, accessToken);
+    window.localStorage.setItem(
+      authConfig.storageUserKeyName,
+      JSON.stringify(response.data.data)
+    );
+
+    // Display a success toast message
+    toast.success(response.data.message, {
+      position: "top-left",
+    });
+
+    router.replace("/reviews");
+  };
+
   const login = (params) => {
     axios
       .post(authConfig.baseUrl + authConfig.loginEndpoint, params)
-      .then(async (response) => {
-        const accessToken = response.headers["authorization"].split(" ")[1];
-        setToken(accessToken);
-        window.localStorage.setItem(
-          authConfig.storageTokenKeyName,
-          accessToken
-        );
-
-        setUser({ ...response.data.data });
-        window.localStorage.setItem(
-          authConfig.storageUserKeyName,
-          JSON.stringify(response.data.data)
-        );
-
-        // Display a success toast message
-        toast.success(response.data.message, {
-          position: "top-left",
-        });
-
-        router.replace("/reviews");
+      .then((response) => {
+        authorizeUser(response);
         console.log("Signed in Successfully :)");
       })
       .catch((error) => {
@@ -106,13 +107,30 @@ export const AuthProvider = ({ children }) => {
       });
   };
 
+  const signup = (params) => {
+    axios
+      .post(authConfig.baseUrl + authConfig.signUpEndpoint, params)
+      .then((response) => {
+        authorizeUser(response);
+        console.log("Signed up Successfully :)");
+      })
+      .catch((error) => {
+        console.error("Signup error:", error);
+
+        // Display an error toast message
+        toast.error("Error occurred while signing up.", {
+          position: "top-left",
+        });
+      });
+  };
+
   const isAuthenticated = () => {
     return user != null && token != null;
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, isAuthenticated, token }}
+      value={{ user, login, logout, signup, isAuthenticated, token }}
     >
       {children}
     </AuthContext.Provider>

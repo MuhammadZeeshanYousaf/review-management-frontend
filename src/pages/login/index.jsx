@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import authConfig from "@/configs/authConfig";
+import Link from "next/link";
 
 const LoginPage = () => {
   const auth = useAuth();
@@ -69,6 +71,12 @@ const LoginPage = () => {
             Login
           </button>
         </form>
+        <div className="mt-3 text-center">
+          Not an Account? &nbsp;
+          <Link href={authConfig.signUpEndpoint} className="text-blue-500">
+            Sign up
+          </Link>
+        </div>
       </div>
     </div>
   );
